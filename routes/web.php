@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use InvoiceShelf\Http\Controllers\ScheduleController;
 use InvoiceShelf\Http\Controllers\V1\Admin\Auth\LoginController;
 use InvoiceShelf\Http\Controllers\V1\Admin\Expense\ShowReceiptController;
 use InvoiceShelf\Http\Controllers\V1\Admin\Report\CustomerSalesReportController;
@@ -145,3 +146,14 @@ Route::get('/forgot-password', function () {
 Route::get('/login', function () {
     return view('app');
 })->where('vue', '[\/\w\.-]*')->name('login')->middleware(['install', 'guest']);
+
+//SCHEDULES
+Route::get('schedules', [ScheduleController::class, 'index'])->name('schedule.index')->middleware(['redirect-if-unauthenticated']);
+Route::post('schedules', [ScheduleController::class, 'store'])->name('schedule.store')->middleware(['redirect-if-unauthenticated']);
+Route::put('schedules/{id}', [ScheduleController::class, 'update'])->name('schedule.update')->middleware(['redirect-if-unauthenticated']);
+Route::put('schedules/{id}/dragdrop', [ScheduleController::class, 'dragdrop'])->name('schedule.dragdrop');
+Route::put('schedules/{id}/resize', [ScheduleController::class, 'resize'])->name('schedule.resize')->middleware(['redirect-if-unauthenticated']);
+Route::delete('schedules/{id}', [ScheduleController::class, 'delete'])->name('schedule.delete')->middleware(['redirect-if-unauthenticated']);
+Route::get('get-installers', [ScheduleController::class, 'getInstallers'])->name('schedule.get-installers')->middleware(['redirect-if-unauthenticated']);
+Route::get('get-customers', [ScheduleController::class, 'getCustomers'])->name('schedule.get-customers')->middleware(['redirect-if-unauthenticated']);
+Route::get('get-token', [ScheduleController::class, 'getToken'])->name('schedule.get-token')->middleware(['redirect-if-unauthenticated']);
