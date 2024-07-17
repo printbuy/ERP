@@ -1,0 +1,31 @@
+<?php
+
+namespace Database\Factories;
+
+use Illuminate\Database\Eloquent\Factories\Factory;
+use InvoiceShelf\Models\CompanySetting;
+use InvoiceShelf\Models\User;
+
+class CompanySettingFactory extends Factory
+{
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = CompanySetting::class;
+
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        return [
+            'option' => $this->faker->word,
+            'value' => $this->faker->word,
+            'company_id' => User::find(1)->companies()->first()->id,
+        ];
+    }
+}

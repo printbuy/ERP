@@ -169,6 +169,7 @@ return [
         InvoiceShelf\Providers\RouteServiceProvider::class,
         InvoiceShelf\Providers\DropboxServiceProvider::class,
         InvoiceShelf\Providers\ViewServiceProvider::class,
+        InvoiceShelf\Providers\TenancyServiceProvider::class,
     ],
 
     /*

@@ -109,6 +109,11 @@ use InvoiceShelf\Http\Controllers\V1\Installation\OnboardingWizardController;
 use InvoiceShelf\Http\Controllers\V1\Installation\RequirementsController;
 use InvoiceShelf\Http\Controllers\V1\Webhook\CronJobController;
 
+use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
+use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
+use Stancl\Tenancy\Middleware\InitializeTenancyByDomainOrSubdomain;
+use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -181,7 +186,11 @@ Route::prefix('/v1')->group(function () {
         Route::post('/finish', FinishController::class);
     });
 
-    Route::middleware(['auth:sanctum', 'company'])->group(function () {
+    Route::middleware([
+        'auth:sanctum', 'company',
+        InitializeTenancyByDomain::class,
+        PreventAccessFromCentralDomains::class,
+    ])->group(function () {
         Route::middleware(['bouncer'])->group(function () {
 
             // Bootstrap

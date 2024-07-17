@@ -28,7 +28,13 @@
 
   <!-- MODAL -->
   <div class="namespace_bootstrap">
-    <div class="modal" id="schedule_modal" tabindex="-1" data-bs-theme="light">
+    <div
+      class="modal"
+      id="schedule_modal"
+      tabindex="-1"
+      data-bs-theme="light"
+      style="background-color: rgba(0, 0, 0, 0.5)"
+    >
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content bg-light">
           <div class="modal-header">
@@ -44,6 +50,32 @@
           </div>
 
           <div class="modal-body">
+            <div class="row">
+              <div class="col-6">
+                <div class="mb-3">
+                  <label class="form-label">Start Date/Time</label>
+                  <input
+                    type="datetime-local"
+                    class="form-control field"
+                    id="start"
+                    name="start"
+                  />
+                  <span id="startError" class="text-danger error"></span>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="mb-3">
+                  <label class="form-label">End Date/Time</label>
+                  <input
+                    type="datetime-local"
+                    class="form-control field"
+                    id="end"
+                    name="end"
+                  />
+                </div>
+              </div>
+            </div>
+
             <div class="row">
               <div class="col-10">
                 <div class="mb-3">
@@ -142,32 +174,6 @@
             ></v-select> -->
 
             <!-- <div>MY VALUE:{{ myValue }}</div> -->
-
-            <div class="row">
-              <div class="col-6">
-                <div class="mb-3">
-                  <label class="form-label">Start Date/Time</label>
-                  <input
-                    type="datetime-local"
-                    class="form-control field"
-                    id="start"
-                    name="start"
-                  />
-                  <span id="startError" class="text-danger error"></span>
-                </div>
-              </div>
-              <div class="col-6">
-                <div class="mb-3">
-                  <label class="form-label">End Date/Time</label>
-                  <input
-                    type="datetime-local"
-                    class="form-control field"
-                    id="end"
-                    name="end"
-                  />
-                </div>
-              </div>
-            </div>
           </div>
           <div class="modal-footer">
             <button
@@ -565,5 +571,8 @@ onMounted(() => {
 }
 .vs__clear {
   margin-right: 8px !important;
+}
+.modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.5); /* Adjust opacity (0.5 here) */
 }
 </style>

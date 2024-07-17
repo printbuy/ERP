@@ -21,139 +21,149 @@ use InvoiceShelf\Http\Controllers\V1\PDF\InvoicePdfController;
 use InvoiceShelf\Http\Controllers\V1\PDF\PaymentPdfController;
 use InvoiceShelf\Models\Company;
 
-// Module Asset Includes
-// ----------------------------------------------
+//TENANCYFORLARAVEL
+use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
+use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 
-Route::get('/modules/styles/{style}', StyleController::class);
+Route::middleware([
+    InitializeTenancyByDomain::class,
+    PreventAccessFromCentralDomains::class,
+])->group(function () {
 
-Route::get('/modules/scripts/{script}', ScriptController::class);
+    // Module Asset Includes
+    // ----------------------------------------------
 
-// Admin Auth
-// ----------------------------------------------
+    Route::get('/modules/styles/{style}', StyleController::class);
 
-Route::post('login', [LoginController::class, 'login']);
+    Route::get('/modules/scripts/{script}', ScriptController::class);
 
-Route::post('auth/logout', function () {
-    Auth::guard('web')->logout();
-});
+    // Admin Auth
+    // ----------------------------------------------
 
-// Customer auth
-// ----------------------------------------------
+    Route::post('login', [LoginController::class, 'login']);
 
-Route::post('/{company:slug}/customer/login', CustomerLoginController::class);
+    Route::post('auth/logout', function () {
+        Auth::guard('web')->logout();
+    });
 
-Route::post('/{company:slug}/customer/logout', function () {
-    Auth::guard('customer')->logout();
-});
+    // Customer auth
+    // ----------------------------------------------
 
-// Report PDF & Expense Endpoints
-// ----------------------------------------------
+    Route::post('/{company:slug}/customer/login', CustomerLoginController::class);
 
-Route::middleware('auth:sanctum')->prefix('reports')->group(function () {
+    Route::post('/{company:slug}/customer/logout', function () {
+        Auth::guard('customer')->logout();
+    });
 
-    // sales report by customer
-    //----------------------------------
-    Route::get('/sales/customers/{hash}', CustomerSalesReportController::class);
+    // Report PDF & Expense Endpoints
+    // ----------------------------------------------
 
-    // sales report by items
-    //----------------------------------
-    Route::get('/sales/items/{hash}', ItemSalesReportController::class);
+    Route::middleware('auth:sanctum')->prefix('reports')->group(function () {
 
-    // report for expenses
-    //----------------------------------
-    Route::get('/expenses/{hash}', ExpensesReportController::class);
+        // sales report by customer
+        //----------------------------------
+        Route::get('/sales/customers/{hash}', CustomerSalesReportController::class);
 
-    // report for tax summary
-    //----------------------------------
-    Route::get('/tax-summary/{hash}', TaxSummaryReportController::class);
+        // sales report by items
+        //----------------------------------
+        Route::get('/sales/items/{hash}', ItemSalesReportController::class);
 
-    // report for profit and loss
-    //----------------------------------
-    Route::get('/profit-loss/{hash}', ProfitLossReportController::class);
+        // report for expenses
+        //----------------------------------
+        Route::get('/expenses/{hash}', ExpensesReportController::class);
 
-    // download expense receipt
+        // report for tax summary
+        //----------------------------------
+        Route::get('/tax-summary/{hash}', TaxSummaryReportController::class);
+
+        // report for profit and loss
+        //----------------------------------
+        Route::get('/profit-loss/{hash}', ProfitLossReportController::class);
+
+        // download expense receipt
+        // -------------------------------------------------
+        Route::get('/expenses/{expense}/download-receipt', DownloadReceiptController::class);
+        Route::get('/expenses/{expense}/receipt', ShowReceiptController::class);
+    });
+
+    // PDF Endpoints
+    // ----------------------------------------------
+
+    Route::middleware('pdf-auth')->group(function () {
+
+        //  invoice pdf
+        // -------------------------------------------------
+        Route::get('/invoices/pdf/{invoice:unique_hash}', InvoicePdfController::class);
+
+        // estimate pdf
+        // -------------------------------------------------
+        Route::get('/estimates/pdf/{estimate:unique_hash}', EstimatePdfController::class);
+
+        // payment pdf
+        // -------------------------------------------------
+        Route::get('/payments/pdf/{payment:unique_hash}', PaymentPdfController::class);
+    });
+
+    // customer pdf endpoints for invoice, estimate and Payment
     // -------------------------------------------------
-    Route::get('/expenses/{expense}/download-receipt', DownloadReceiptController::class);
-    Route::get('/expenses/{expense}/receipt', ShowReceiptController::class);
-});
 
-// PDF Endpoints
-// ----------------------------------------------
+    Route::prefix('/customer')->group(function () {
+        Route::get('/invoices/{email_log:token}', [CustomerInvoicePdfController::class, 'getInvoice']);
+        Route::get('/invoices/view/{email_log:token}', [CustomerInvoicePdfController::class, 'getPdf'])->name('invoice');
 
-Route::middleware('pdf-auth')->group(function () {
+        Route::get('/estimates/{email_log:token}', [CustomerEstimatePdfController::class, 'getEstimate']);
+        Route::get('/estimates/view/{email_log:token}', [CustomerEstimatePdfController::class, 'getPdf'])->name('estimate');
 
-    //  invoice pdf
+        Route::get('/payments/{email_log:token}', [CustomerPaymentPdfController::class, 'getPayment']);
+        Route::get('/payments/view/{email_log:token}', [CustomerPaymentPdfController::class, 'getPdf'])->name('payment');
+    });
+
+    // Setup for installation of app
+    // ----------------------------------------------
+
+    Route::get('/installation', function () {
+        return view('app');
+    })->name('install')->middleware('redirect-if-installed');
+
+    // Move other http requests to the Vue App
     // -------------------------------------------------
-    Route::get('/invoices/pdf/{invoice:unique_hash}', InvoicePdfController::class);
 
-    // estimate pdf
-    // -------------------------------------------------
-    Route::get('/estimates/pdf/{estimate:unique_hash}', EstimatePdfController::class);
+    Route::get('/admin/{vue?}', function () {
+        return view('app');
+    })->where('vue', '[\/\w\.-]*')->name('admin.dashboard')->middleware(['install', 'redirect-if-unauthenticated']);
 
-    // payment pdf
-    // -------------------------------------------------
-    Route::get('/payments/pdf/{payment:unique_hash}', PaymentPdfController::class);
+    Route::get('{company:slug}/customer/{vue?}', function (Company $company) {
+        return view('app')->with([
+            'customer_logo' => get_company_setting('customer_portal_logo', $company->id),
+            'current_theme' => get_company_setting('customer_portal_theme', $company->id),
+            'customer_page_title' => get_company_setting('customer_portal_page_title', $company->id),
+        ]);
+    })->where('vue', '[\/\w\.-]*')->name('customer.dashboard')->middleware(['install']);
+
+    Route::get('/', function () {
+        return view('app');
+    })->where('vue', '[\/\w\.-]*')->name('home')->middleware(['install', 'guest']);
+
+    Route::get('/reset-password/{token}', function () {
+        return view('app');
+    })->where('vue', '[\/\w\.-]*')->name('reset-password')->middleware(['install', 'guest']);
+
+    Route::get('/forgot-password', function () {
+        return view('app');
+    })->where('vue', '[\/\w\.-]*')->name('forgot-password')->middleware(['install', 'guest']);
+
+    Route::get('/login', function () {
+        return view('app');
+    })->where('vue', '[\/\w\.-]*')->name('login')->middleware(['install', 'guest']);
+
+    //SCHEDULES
+    Route::get('schedules', [ScheduleController::class, 'index'])->name('schedule.index')->middleware(['redirect-if-unauthenticated']);
+    Route::post('schedules', [ScheduleController::class, 'store'])->name('schedule.store')->middleware(['redirect-if-unauthenticated']);
+    Route::put('schedules/{id}', [ScheduleController::class, 'update'])->name('schedule.update')->middleware(['redirect-if-unauthenticated']);
+    Route::put('schedules/{id}/dragdrop', [ScheduleController::class, 'dragdrop'])->name('schedule.dragdrop');
+    Route::put('schedules/{id}/resize', [ScheduleController::class, 'resize'])->name('schedule.resize')->middleware(['redirect-if-unauthenticated']);
+    Route::delete('schedules/{id}', [ScheduleController::class, 'delete'])->name('schedule.delete')->middleware(['redirect-if-unauthenticated']);
+    Route::get('get-installers', [ScheduleController::class, 'getInstallers'])->name('schedule.get-installers')->middleware(['redirect-if-unauthenticated']);
+    Route::get('get-customers', [ScheduleController::class, 'getCustomers'])->name('schedule.get-customers')->middleware(['redirect-if-unauthenticated']);
+    Route::get('get-token', [ScheduleController::class, 'getToken'])->name('schedule.get-token')->middleware(['redirect-if-unauthenticated']);
 });
-
-// customer pdf endpoints for invoice, estimate and Payment
-// -------------------------------------------------
-
-Route::prefix('/customer')->group(function () {
-    Route::get('/invoices/{email_log:token}', [CustomerInvoicePdfController::class, 'getInvoice']);
-    Route::get('/invoices/view/{email_log:token}', [CustomerInvoicePdfController::class, 'getPdf'])->name('invoice');
-
-    Route::get('/estimates/{email_log:token}', [CustomerEstimatePdfController::class, 'getEstimate']);
-    Route::get('/estimates/view/{email_log:token}', [CustomerEstimatePdfController::class, 'getPdf'])->name('estimate');
-
-    Route::get('/payments/{email_log:token}', [CustomerPaymentPdfController::class, 'getPayment']);
-    Route::get('/payments/view/{email_log:token}', [CustomerPaymentPdfController::class, 'getPdf'])->name('payment');
-});
-
-// Setup for installation of app
-// ----------------------------------------------
-
-Route::get('/installation', function () {
-    return view('app');
-})->name('install')->middleware('redirect-if-installed');
-
-// Move other http requests to the Vue App
-// -------------------------------------------------
-
-Route::get('/admin/{vue?}', function () {
-    return view('app');
-})->where('vue', '[\/\w\.-]*')->name('admin.dashboard')->middleware(['install', 'redirect-if-unauthenticated']);
-
-Route::get('{company:slug}/customer/{vue?}', function (Company $company) {
-    return view('app')->with([
-        'customer_logo' => get_company_setting('customer_portal_logo', $company->id),
-        'current_theme' => get_company_setting('customer_portal_theme', $company->id),
-        'customer_page_title' => get_company_setting('customer_portal_page_title', $company->id),
-    ]);
-})->where('vue', '[\/\w\.-]*')->name('customer.dashboard')->middleware(['install']);
-
-Route::get('/', function () {
-    return view('app');
-})->where('vue', '[\/\w\.-]*')->name('home')->middleware(['install', 'guest']);
-
-Route::get('/reset-password/{token}', function () {
-    return view('app');
-})->where('vue', '[\/\w\.-]*')->name('reset-password')->middleware(['install', 'guest']);
-
-Route::get('/forgot-password', function () {
-    return view('app');
-})->where('vue', '[\/\w\.-]*')->name('forgot-password')->middleware(['install', 'guest']);
-
-Route::get('/login', function () {
-    return view('app');
-})->where('vue', '[\/\w\.-]*')->name('login')->middleware(['install', 'guest']);
-
-//SCHEDULES
-Route::get('schedules', [ScheduleController::class, 'index'])->name('schedule.index')->middleware(['redirect-if-unauthenticated']);
-Route::post('schedules', [ScheduleController::class, 'store'])->name('schedule.store')->middleware(['redirect-if-unauthenticated']);
-Route::put('schedules/{id}', [ScheduleController::class, 'update'])->name('schedule.update')->middleware(['redirect-if-unauthenticated']);
-Route::put('schedules/{id}/dragdrop', [ScheduleController::class, 'dragdrop'])->name('schedule.dragdrop');
-Route::put('schedules/{id}/resize', [ScheduleController::class, 'resize'])->name('schedule.resize')->middleware(['redirect-if-unauthenticated']);
-Route::delete('schedules/{id}', [ScheduleController::class, 'delete'])->name('schedule.delete')->middleware(['redirect-if-unauthenticated']);
-Route::get('get-installers', [ScheduleController::class, 'getInstallers'])->name('schedule.get-installers')->middleware(['redirect-if-unauthenticated']);
-Route::get('get-customers', [ScheduleController::class, 'getCustomers'])->name('schedule.get-customers')->middleware(['redirect-if-unauthenticated']);
-Route::get('get-token', [ScheduleController::class, 'getToken'])->name('schedule.get-token')->middleware(['redirect-if-unauthenticated']);

@@ -56,6 +56,8 @@ class RouteServiceProvider extends ServiceProvider
                 ->namespace($this->namespace)
                 ->group(base_path('routes/web.php'));
         });
+        // $this->mapWebRoutes();
+        // $this->mapApiRoutes();
     }
 
     /**
@@ -68,5 +70,35 @@ class RouteServiceProvider extends ServiceProvider
         RateLimiter::for('api', function (Request $request) {
             return Limit::perMinute(60);
         });
+    }
+
+
+    //multi-tenancy
+    // RouteServiceProvider
+
+    protected function mapWebRoutes()
+    {
+        foreach ($this->centralDomains() as $domain) {
+            Route::middleware('web')
+                ->domain($domain)
+                ->namespace($this->namespace)
+                ->group(base_path('routes/web.php'));
+        }
+    }
+
+    protected function mapApiRoutes()
+    {
+        foreach ($this->centralDomains() as $domain) {
+            Route::prefix('api')
+                ->domain($domain)
+                ->middleware('api')
+                ->namespace($this->namespace)
+                ->group(base_path('routes/api.php'));
+        }
+    }
+
+    protected function centralDomains(): array
+    {
+        return config('tenancy.central_domains', []);
     }
 }
