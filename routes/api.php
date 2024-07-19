@@ -166,7 +166,11 @@ Route::prefix('/v1')->group(function () {
     // Onboarding
     //----------------------------------
 
-    Route::middleware(['redirect-if-installed'])->prefix('installation')->group(function () {
+    Route::middleware([
+        'redirect-if-installed',
+        InitializeTenancyByDomain::class,
+        PreventAccessFromCentralDomains::class
+    ])->prefix('installation')->group(function () {
         Route::get('/wizard-step', [OnboardingWizardController::class, 'getStep']);
 
         Route::post('/wizard-step', [OnboardingWizardController::class, 'updateStep']);

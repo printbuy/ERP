@@ -46,7 +46,7 @@ class EnvironmentManager
      */
     public function updateEnv(array $data)
     {
-        if (empty($data) || ! is_array($data) || ! is_file($this->envPath)) {
+        if (empty($data) || !is_array($data) || !is_file($this->envPath)) {
             return false;
         }
 
@@ -62,7 +62,7 @@ class EnvironmentManager
 
                 // Check if new or old key
                 if ($entry[0] == $data_key) {
-                    $env[$env_key] = $data_key.'='.$this->encode($data_value);
+                    $env[$env_key] = $data_key . '=' . $this->encode($data_value);
                     $updated = true;
                 } else {
                     $env[$env_key] = $this->encode($env_value);
@@ -70,8 +70,8 @@ class EnvironmentManager
             }
 
             // Lets create if not available
-            if (! $updated) {
-                $env[] = $data_key.'='.$this->encode($data_value);
+            if (!$updated) {
+                $env[] = $data_key . '=' . $this->encode($data_value);
             }
         }
 
@@ -90,12 +90,11 @@ class EnvironmentManager
     private function encode($str)
     {
 
-        if (strpos($str, ' ') !== false || preg_match('/'.preg_quote('^\'£$%^&*()}{@#~?><,@|-=-_+-¬', '/').'/', $str)) {
-            $str = '"'.$str.'"';
+        if (strpos($str, ' ') !== false || preg_match('/' . preg_quote('^\'£$%^&*()}{@#~?><,@|-=-_+-¬', '/') . '/', $str)) {
+            $str = '"' . $str . '"';
         }
 
         return $str;
-
     }
 
     /**
@@ -106,45 +105,44 @@ class EnvironmentManager
     public function saveDatabaseVariables(DatabaseEnvironmentRequest $request)
     {
 
-        $dbEnv = [
-            'APP_URL' => $request->get('app_url'),
-            'DB_CONNECTION' => $request->get('database_connection'),
-            'SANCTUM_STATEFUL_DOMAINS' => $request->get('app_domain'),
-            'SESSION_DOMAIN' => explode(':', $request->get('app_domain'))[0],
-        ];
+        // $dbEnv = [
+        //     'APP_URL' => $request->get('app_url'),
+        //     'DB_CONNECTION' => $request->get('database_connection'),
+        //     'SANCTUM_STATEFUL_DOMAINS' => $request->get('app_domain'),
+        //     'SESSION_DOMAIN' => explode(':', $request->get('app_domain'))[0],
+        // ];
 
-        if ($request->has('database_username') && $request->has('database_password')) {
-            $dbEnv['DB_HOST'] = $request->get('database_hostname');
-            $dbEnv['DB_PORT'] = $request->get('database_port');
-            $dbEnv['DB_DATABASE'] = $request->get('database_name');
-            $dbEnv['DB_USERNAME'] = $request->get('database_username');
-            $dbEnv['DB_PASSWORD'] = $request->get('database_password');
+        // if ($request->has('database_username') && $request->has('database_password')) {
+        //     $dbEnv['DB_HOST'] = $request->get('database_hostname');
+        //     $dbEnv['DB_PORT'] = $request->get('database_port');
+        //     $dbEnv['DB_DATABASE'] = $request->get('database_name');
+        //     $dbEnv['DB_USERNAME'] = $request->get('database_username');
+        //     $dbEnv['DB_PASSWORD'] = $request->get('database_password');
+        // } else {
+        //     $dbEnv['DB_DATABASE'] = $request->get('database_name');
+        // }
 
-        } else {
-            $dbEnv['DB_DATABASE'] = $request->get('database_name');
-        }
+        // try {
+        //     $this->checkDatabaseConnection($request);
 
-        try {
-            $this->checkDatabaseConnection($request);
+        //     if (\Schema::hasTable('users')) {
+        //         return [
+        //             'error' => 'database_should_be_empty',
+        //         ];
+        //     }
+        // } catch (Exception $e) {
+        //     return [
+        //         'error_message' => $e->getMessage(),
+        //     ];
+        // }
 
-            if (\Schema::hasTable('users')) {
-                return [
-                    'error' => 'database_should_be_empty',
-                ];
-            }
-        } catch (Exception $e) {
-            return [
-                'error_message' => $e->getMessage(),
-            ];
-        }
-
-        try {
-            $this->updateEnv($dbEnv);
-        } catch (Exception $e) {
-            return [
-                'error' => 'database_variables_save_error',
-            ];
-        }
+        // try {
+        //     $this->updateEnv($dbEnv);
+        // } catch (Exception $e) {
+        //     return [
+        //         'error' => 'database_variables_save_error',
+        //     ];
+        // }
 
         return [
             'success' => 'database_variables_save_successfully',
@@ -199,7 +197,6 @@ class EnvironmentManager
         try {
 
             $this->updateEnv($mailEnv);
-
         } catch (Exception $e) {
             return [
                 'error' => 'mail_variables_save_error',
@@ -289,7 +286,6 @@ class EnvironmentManager
                 ];
 
                 break;
-
         }
 
         return $mailEnv;
@@ -307,7 +303,6 @@ class EnvironmentManager
         try {
 
             $this->updateEnv($diskEnv);
-
         } catch (Exception $e) {
             return [
                 'error' => 'disk_variables_save_error',
@@ -421,9 +416,8 @@ class EnvironmentManager
             if ($parts_line[0] != $parts_last[0]) {
                 $formatted .= $this->delimiter;
             }
-            $formatted .= $current.$this->delimiter;
+            $formatted .= $current . $this->delimiter;
             $previous = $current;
-
         }
 
         file_put_contents($this->envPath, trim($formatted));

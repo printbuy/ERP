@@ -17,7 +17,6 @@ return [
      * Only relevant if you're using the domain or subdomain identification middleware.
      */
     'central_domains' => [
-
         'localhost',
     ],
 
@@ -45,6 +44,7 @@ return [
          * Connection used as a "template" for the dynamically created tenant database connection.
          * Note: don't name your template connection tenant. That name is reserved by package.
          */
+        //'template_tenant_connection' => null,
         'template_tenant_connection' => 'tenant_conn',
 
         /**
