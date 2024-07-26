@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use InvoiceShelf\Http\Controllers\ScheduleController;
+use InvoiceShelf\Http\Controllers\TenantController;
 use InvoiceShelf\Http\Controllers\V1\Admin\Auth\LoginController;
 use InvoiceShelf\Http\Controllers\V1\Admin\Expense\ShowReceiptController;
 use InvoiceShelf\Http\Controllers\V1\Admin\Report\CustomerSalesReportController;
@@ -166,4 +167,8 @@ Route::middleware([
     Route::get('get-installers', [ScheduleController::class, 'getInstallers'])->name('schedule.get-installers')->middleware(['redirect-if-unauthenticated']);
     Route::get('get-customers', [ScheduleController::class, 'getCustomers'])->name('schedule.get-customers')->middleware(['redirect-if-unauthenticated']);
     Route::get('get-token', [ScheduleController::class, 'getToken'])->name('schedule.get-token')->middleware(['redirect-if-unauthenticated']);
+
+    //TENANTS
+    Route::get('/tenants', [TenantController::class, 'index'])->name('tenants.index');
+    Route::post('/tenants', [TenantController::class, 'store'])->name('tenants.store');
 });

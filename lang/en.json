@@ -4,6 +4,7 @@
     "customers": "Customers",
     "installers": "Installers",
     "items": "Items",
+    "tenants": "Tenants",
     "schedules": "Schedules",
     "invoices": "Invoices",
     "recurring-invoices": "Recurring Invoices",

@@ -39,21 +39,21 @@ return [
             'prefix' => '',
         ],
 
-        'tenant_conn' => [
-            'driver' => 'mysql',
-            'host' => env('DB_TENANT_HOST', '127.0.0.1'),
-            'port' => env('DB_TENANT_PORT', '3306'),
-            'database' => null, // This will be set dynamically
-            'username' => env('DB_TENANT_USERNAME', 'root'),
-            'password' => env('DB_TENANT_PASSWORD', ''),
-            'unix_socket' => env('DB_TENANT_SOCKET', ''),
-            'charset' => 'utf8mb4',
-            'collation' => 'utf8mb4_unicode_ci',
-            'prefix' => '',
-            'prefix_indexes' => true,
-            'strict' => false,
-            'engine' => null,
-        ],
+        // 'tenant_conn' => [
+        //     'driver' => 'mysql',
+        //     'host' => env('DB_TENANT_HOST', '127.0.0.1'),
+        //     'port' => env('DB_TENANT_PORT', '3306'),
+        //     'database' => null, // This will be set dynamically
+        //     'username' => env('DB_TENANT_USERNAME', 'root'),
+        //     'password' => env('DB_TENANT_PASSWORD', ''),
+        //     'unix_socket' => env('DB_TENANT_SOCKET', ''),
+        //     'charset' => 'utf8mb4',
+        //     'collation' => 'utf8mb4_unicode_ci',
+        //     'prefix' => '',
+        //     'prefix_indexes' => true,
+        //     'strict' => false,
+        //     'engine' => null,
+        // ],
 
         'mysql' => [
             'driver' => 'mysql',

@@ -3,13 +3,14 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Route;
+use InvoiceShelf\Http\Controllers\TenantController;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomainOrSubdomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 
-use InvoiceShelf\Http\Controllers\V1\Admin\Auth\LoginController;
 
+use Laravel\Sanctum\Http\Controllers\CsrfCookieController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,7 +24,13 @@ use InvoiceShelf\Http\Controllers\V1\Admin\Auth\LoginController;
 |
 */
 
-
+Route::group(['prefix' => config('sanctum.prefix', 'sanctum')], static function () {
+    Route::get('/csrf-cookie', [CsrfCookieController::class, 'show'])
+        ->middleware([
+            'web',
+            InitializeTenancyByDomain::class // Use tenancy initialization middleware of your choice
+        ])->name('sanctum.csrf-cookie');
+});
 
 Route::middleware([
     'web',
@@ -61,6 +68,8 @@ Route::middleware([
     //     // dd($currentDb);
     //     return view('app');
     // })->where('vue', '[\/\w\.-]*')->name('login');
+
+
 
 
 

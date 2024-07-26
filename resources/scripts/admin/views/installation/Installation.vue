@@ -32,8 +32,8 @@ import { useRouter } from 'vue-router'
 
 export default {
   components: {
-    step_1: Step1RequirementsCheck,
-    step_2: Step2PermissionCheck,
+    // step_1: Step1RequirementsCheck,
+    // step_2: Step2PermissionCheck,
     step_3: Step3DatabaseConfig,
     step_4: Step4VerifyDomain,
     step_5: Step5EmailConfig,

@@ -62,7 +62,7 @@ class EnvironmentManager
 
                 // Check if new or old key
                 if ($entry[0] == $data_key) {
-                    $env[$env_key] = $data_key . '=' . $this->encode($data_value);
+                    $env[$env_key] = $data_key . '=' . $entry[1] . ',' . $this->encode($data_value);
                     $updated = true;
                 } else {
                     $env[$env_key] = $this->encode($env_value);
@@ -104,6 +104,8 @@ class EnvironmentManager
      */
     public function saveDatabaseVariables(DatabaseEnvironmentRequest $request)
     {
+
+        // NOT USING THIS ANYMORE BECAUSE THE (TENANCYFORLARAVEL) IS CREATING THE DATABASE AUTOMATICLY
 
         // $dbEnv = [
         //     'APP_URL' => $request->get('app_url'),

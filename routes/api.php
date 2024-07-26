@@ -272,6 +272,15 @@ Route::prefix('/v1')->group(function () {
 
             Route::resource('units', UnitsController::class);
 
+            // Tenants
+            //----------------------------------
+
+            // Route::post('/tenants/delete', [TenantsController::class, 'delete']);
+
+            // Route::resource('tenants', TenantsController::class);
+
+            // Route::resource('units', UnitsController::class);
+
             // Invoices
             //-------------------------------------------------
 

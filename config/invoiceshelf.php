@@ -13,6 +13,11 @@ use InvoiceShelf\Models\Note;
 use InvoiceShelf\Models\Payment;
 use InvoiceShelf\Models\RecurringInvoice;
 use InvoiceShelf\Models\TaxType;
+use InvoiceShelf\Models\Tenant;
+
+
+// $subdomain = explode('.', $_SERVER['HTTP_HOST']);
+
 
 return [
 
@@ -323,6 +328,20 @@ return [
             'ability' => 'view-item',
             'model' => Item::class,
         ],
+
+
+        // [
+        //     'title' => ($subdomain[0] == "admin") ? 'navigation.tenants' : '',
+        //     'group' => ($subdomain[0] == "admin") ? 1 : '',
+        //     'link' => ($subdomain[0] == "admin") ? '/tenants' : '',
+        //     'icon' => ($subdomain[0] == "admin") ? 'StarIcon' : '',
+        //     'name' => ($subdomain[0] == "admin") ? 'Items' : '',
+        //     'owner_only' => ($subdomain[0] == "admin") ? true : '',
+        //     'ability' => ($subdomain[0] == "admin") ? 'view-item' : '',
+        //     'model' => ($subdomain[0] == "admin") ? Tenant::class : '',
+        // ],
+
+
         [
             'title' => 'navigation.schedules',
             'group' => 2,
