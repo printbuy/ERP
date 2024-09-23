@@ -39,19 +39,7 @@
           >
             <div class="absolute top-0 right-0 pt-2 -mr-12">
               <button
-                class="
-                  flex
-                  items-center
-                  justify-center
-                  w-10
-                  h-10
-                  ml-1
-                  rounded-full
-                  focus:outline-none
-                  focus:ring-2
-                  focus:ring-inset
-                  focus:ring-white
-                "
+                class="flex items-center justify-center w-10 h-10 ml-1 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
                 @click="globalStore.setSidebarVisibility(false)"
               >
                 <span class="sr-only">Close sidebar</span>
@@ -112,18 +100,7 @@
 
   <!-- DESKTOP MENU -->
   <div
-    class="
-      hidden
-      w-56
-      h-screen
-      pb-32
-      overflow-y-auto
-      bg-white
-      border-r border-gray-200 border-solid
-      xl:w-64
-      md:fixed md:flex md:flex-col md:inset-y-0
-      pt-16
-    "
+    class="hidden w-56 h-screen pb-32 overflow-y-auto bg-white border-r border-gray-200 border-solid xl:w-64 md:fixed md:flex md:flex-col md:inset-y-0 pt-16"
   >
     <div
       v-for="menu in globalStore.menuGroups"
@@ -153,12 +130,35 @@
 
         {{ $t(item.title) }}
       </router-link>
+      <p v-if="subdomain == 'admin'">
+        <a
+          href="/tenants"
+          class="text-black cursor-pointer px-0 pl-6 hover:bg-gray-50 py-3 group flex items-center border-l-4 border-solid text-sm not-italic font-medium"
+          ><svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke="currentColor"
+            aria-hidden="true"
+            class="h-5 w-5 text-gray-400 group-hover:text-black mr-4 shrink-0 h-5 w-5"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
+            ></path>
+          </svg>
+          Tenants</a
+        >
+      </p>
     </div>
   </div>
 </template>
 
 <script setup>
 import MainLogo from '@/scripts/components/icons/MainLogo.vue'
+import { ref, onMounted } from 'vue'
 
 import {
   Dialog,
@@ -173,7 +173,23 @@ import { useGlobalStore } from '@/scripts/admin/stores/global'
 const route = useRoute()
 const globalStore = useGlobalStore()
 
+const subdomain = ref(null)
+
 function hasActiveUrl(url) {
   return route.path.indexOf(url) > -1
 }
+
+onMounted(() => {
+  // Function to extract the subdomain
+  const extractSubdomain = () => {
+    const hostname = window.location.hostname
+    const parts = hostname.split('.')
+
+    subdomain.value = parts[0]
+    console.log(subdomain.value)
+  }
+
+  // Extract the subdomain when the component is mounted
+  extractSubdomain()
+})
 </script>

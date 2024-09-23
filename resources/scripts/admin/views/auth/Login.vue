@@ -91,7 +91,7 @@ const rules = {
 
 const v$ = useVuelidate(
   rules,
-  computed(() => authStore.loginData)
+  computed(() => authStore.loginData),
 )
 
 const getInputType = computed(() => {

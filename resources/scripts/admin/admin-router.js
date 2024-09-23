@@ -20,6 +20,13 @@ const CustomerCreate = () =>
   import('@/scripts/admin/views/customers/Create.vue')
 const CustomerView = () => import('@/scripts/admin/views/customers/View.vue')
 
+// Installer
+const InstallerIndex = () =>
+  import('@/scripts/admin/views/installers/Index.vue')
+const InstallerCreate = () =>
+  import('@/scripts/admin/views/installers/Create.vue')
+const InstallerView = () => import('@/scripts/admin/views/installers/View.vue')
+
 //Settings
 const SettingsIndex = () =>
   import('@/scripts/admin/views/settings/SettingsIndex.vue')
@@ -60,6 +67,10 @@ const RolesSettings = () =>
 // Items
 const ItemsIndex = () => import('@/scripts/admin/views/items/Index.vue')
 const ItemCreate = () => import('@/scripts/admin/views/items/Create.vue')
+
+// Schedule
+const ScheduleIndex = () => import('@/scripts/admin/views/schedule/Index.vue')
+const ScheduleCreate = () => import('@/scripts/admin/views/schedule/Create.vue')
 
 // Expenses
 const ExpensesIndex = () => import('@/scripts/admin/views/expenses/Index.vue')
@@ -194,6 +205,30 @@ export default [
         name: 'customers.view',
         meta: { ability: abilities.VIEW_CUSTOMER },
         component: CustomerView,
+      },
+      // Installers
+      {
+        path: 'installers',
+        meta: { ability: abilities.VIEW_INSTALLER },
+        component: InstallerIndex,
+      },
+      {
+        path: 'installers/create',
+        name: 'installers.create',
+        meta: { ability: abilities.CREATE_INSTALLER },
+        component: InstallerCreate,
+      },
+      {
+        path: 'installers/:id/edit',
+        name: 'installers.edit',
+        meta: { ability: abilities.EDIT_INSTALLER },
+        component: InstallerCreate,
+      },
+      {
+        path: 'installers/:id/view',
+        name: 'installers.view',
+        meta: { ability: abilities.VIEW_INSTALLER },
+        component: InstallerView,
       },
       // Payments
       {
@@ -347,6 +382,25 @@ export default [
         name: 'items.edit',
         meta: { ability: abilities.EDIT_ITEM },
         component: ItemCreate,
+      },
+
+      // Schedules
+      {
+        path: 'schedules',
+        meta: { ability: abilities.VIEW_SCHEDULE },
+        component: ScheduleIndex,
+      },
+      {
+        path: 'schedules/create',
+        name: 'schedules.create',
+        meta: { ability: abilities.CREATE_SCHEDULE },
+        component: ScheduleCreate,
+      },
+      {
+        path: 'schedules/:id/edit',
+        name: 'schedules.edit',
+        meta: { ability: abilities.EDIT_SCHEDULE },
+        component: ScheduleCreate,
       },
 
       // Expenses

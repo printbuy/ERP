@@ -7,10 +7,13 @@ import * as pinia from 'pinia'
 import * as Vue from 'vue'
 import * as Vuelidate from '@vuelidate/core'
 
-import.meta.glob([
-  '../static/img/**',
-  '../static/fonts/**',
-]);
+import.meta.glob(['../static/img/**', '../static/fonts/**'])
+
+import $ from 'jquery'
+window.$ = $
+window.jQuery = $
+
+import '../sass/custom-bootstrap.scss'
 
 window.pinia = pinia
 window.Vuelidate = Vuelidate

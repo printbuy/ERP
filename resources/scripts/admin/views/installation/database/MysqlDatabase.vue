@@ -1,7 +1,7 @@
 <template>
   <form action="" @submit.prevent="next">
     <div class="grid grid-cols-1 gap-5 md:grid-cols-2 lg:mb-6 md:mb-6">
-      <BaseInputGroup
+      <!-- <BaseInputGroup
         :label="$t('wizard.database.app_url')"
         :error="v$.app_url.$error && v$.app_url.$errors[0].$message"
         required
@@ -83,7 +83,7 @@
           v-model="databaseData.database_hostname"
           :invalid="v$.database_hostname.$error"
         />
-      </BaseInputGroup>
+      </BaseInputGroup> -->
     </div>
 
     <BaseButton
@@ -95,7 +95,8 @@
       <template #left="slotProps">
         <BaseIcon v-if="!isSaving" name="SaveIcon" :class="slotProps.class" />
       </template>
-      {{ $t('wizard.save_cont') }}
+      <!-- {{ $t('wizard.save_cont') }} -->
+      Generate and Continue
     </BaseButton>
   </form>
 </template>
@@ -169,14 +170,14 @@ const rules = {
   },
 }
 
-const v$ = useVuelidate(rules, databaseData.value)
+/*const v$ = useVuelidate(rules, databaseData.value)*/
 
 function next() {
-  v$.value.$touch()
+  //v$.value.$touch()
 
-  if (v$.value.$invalid) {
-    return true
-  }
+  // if (v$.value.$invalid) {
+  //   return true
+  // }
   emit('submit-data', databaseData.value)
 }
 

@@ -1,6 +1,5 @@
 <template>
   <div class="flex flex-col items-center justify-between w-full pt-10">
-
     <img
       id="logo-invoiceshelf"
       :src="getTickImage()"
@@ -31,11 +30,10 @@ import Step8CompanyPreferences from './Step8CompanyPreferences.vue'
 import { useInstallationStore } from '@/scripts/admin/stores/installation'
 import { useRouter } from 'vue-router'
 
-
 export default {
   components: {
-    step_1: Step1RequirementsCheck,
-    step_2: Step2PermissionCheck,
+    // step_1: Step1RequirementsCheck,
+    // step_2: Step2PermissionCheck,
     step_3: Step3DatabaseConfig,
     step_4: Step4VerifyDomain,
     step_5: Step5EmailConfig,
@@ -45,8 +43,8 @@ export default {
   },
 
   setup() {
-    let stepComponent = ref('step_1')
-    let currentStepNumber = ref(1)
+    let stepComponent = ref('step_3')
+    let currentStepNumber = ref(3)
 
     const router = useRouter()
     const installationStore = useInstallationStore()
@@ -111,7 +109,7 @@ export default {
       onStepChange,
       saveStepProgress,
       onNavClick,
-      getTickImage
+      getTickImage,
     }
   },
 }

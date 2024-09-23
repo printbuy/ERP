@@ -1,6 +1,7 @@
 <template>
   <SendEstimateModal @update="updateSentEstimate" />
-  <BasePage v-if="estimateData" class="xl:pl-96 xl:ml-8">
+  <!-- <BasePage v-if="estimateData" class="xl:pl-96 xl:ml-8"> -->
+  <BasePage v-if="estimateData" class="">
     <BasePageHeader :title="pageTitle">
       <template #actions>
         <div class="mr-3 text-sm">
@@ -35,7 +36,7 @@
       </template>
     </BasePageHeader>
 
-    <!-- Sidebar -->
+    <!-- Sidebar
     <div
       class="
         fixed
@@ -256,21 +257,15 @@
           {{ $t('estimates.no_matching_estimates') }}
         </p>
       </div>
-    </div>
+    </div> -->
 
     <div
       class="flex flex-col min-h-0 mt-8 overflow-hidden"
       style="height: 75vh"
     >
       <iframe
-        :src="`${shareableLink}`"
-        class="
-          flex-1
-          border border-gray-400 border-solid
-          rounded-md
-          bg-white
-          frame-style
-        "
+        :src="`${shareableLink}#zoom=page-width`"
+        class="flex-1 border border-gray-400 border-solid rounded-md bg-white frame-style"
       />
     </div>
   </BasePage>
@@ -398,7 +393,7 @@ async function loadEstimates(pageNumber, fromScrollListener = false) {
   currentPageNumber.value = pageNumber ? pageNumber : 1
   lastPageNumber.value = response.data.meta.last_page
   let estimateFound = estimateList.value.find(
-    (est) => est.id == route.params.id
+    (est) => est.id == route.params.id,
   )
 
   if (
@@ -529,7 +524,7 @@ async function removeEstimate(id) {
 
 function updateSentEstimate() {
   let pos = estimateList.value.findIndex(
-    (estimate) => estimate.id === estimateData.value.id
+    (estimate) => estimate.id === estimateData.value.id,
   )
 
   if (estimateList.value[pos]) {

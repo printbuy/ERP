@@ -44,4 +44,7 @@ return [
         'encrypt_cookies' => InvoiceShelf\Http\Middleware\EncryptCookies::class,
     ],
 
+    'routes' => false
+
+
 ];
