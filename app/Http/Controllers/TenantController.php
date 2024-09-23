@@ -49,8 +49,8 @@ class TenantController extends Controller
         $tenant->plan = $request->plan;
         $tenant->save();
 
-        $tenant->domains()->create(['domain' => $request->id . '.printby.ca']);
+        $tenant->domains()->create(['domain' => $request->id . '.localhost']);
 
-        return redirect('http://' . $request->id . '.printby.ca');
+        return redirect('http://' . $request->id . '.localhost');
     }
 }
