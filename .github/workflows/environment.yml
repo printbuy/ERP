@@ -1,0 +1,30 @@
+name: Environment Detection
+
+on:
+  workflow_call:
+    outputs:
+      env_name:
+        description: "Detected Environment"
+        value: ${{ jobs.environment.outputs.env_name }}
+
+jobs:
+  environment:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+      - name: Parse Branch / Tag
+        id: branch_check
+        run: |
+          echo "Running on branch ${{ github.ref }}"
+          if [ "${{ github.ref }}" = "refs/heads/master" ]; then
+            echo "env_name=production" >> $GITHUB_OUTPUT
+          elif [ "${{ github.ref }}" = "refs/heads/develop" ]; then
+            echo "env_name=develop" >> $GITHUB_OUTPUT
+          else
+            echo "env_name=develop" >> $GITHUB_OUTPUT
+          fi
+      - name: Use variable setup in previous step
+        run: echo "I'm using variable ${{ steps.branch_check.outputs.env_name }}"
+    outputs:
+      env_name: ${{ steps.branch_check.outputs.env_name }}

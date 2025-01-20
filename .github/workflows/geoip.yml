@@ -1,0 +1,37 @@
+name: GeoIP
+
+on:
+  workflow_call:
+
+jobs:
+  environment:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check if Cache is Available
+        uses: actions/cache/restore@v4
+        id: geoip_cache
+        with:
+          key: geoip
+          lookup-only: true
+          path: ./database/geoip/
+
+      - name: Download GeoIP from S3
+        id: download_from_s3
+        if: steps.geoip_cache.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p ./database/geoip; \
+          cd ./database/geoip && { curl -O https://ytz-cloud-production.s3.amazonaws.com/yredir/geoip/GeoIP2-City.mmdb; cd -; }; \
+          cd ./database/geoip && { curl -O https://ytz-cloud-production.s3.amazonaws.com/yredir/geoip/GeoIP2-Connection-Type.mmdb; cd -; }; \
+          cd ./database/geoip && { curl -O https://ytz-cloud-production.s3.amazonaws.com/yredir/geoip/GeoIP2-Country.mmdb; cd -; }; \
+          cd ./database/geoip && { curl -O https://ytz-cloud-production.s3.amazonaws.com/yredir/geoip/GeoIP2-ISP.mmdb; cd -; }; \
+          cd ./database/geoip && { curl -o ip2location.bin https://ytz-cloud-production.s3.amazonaws.com/yredir/geoip/IP-COUNTRY-REGION-CITY-LATITUDE-LONGITUDE-ISP-DOMAIN-MOBILE-USAGETYPE.BIN; cd -; }; \
+          cd ./database/geoip && { curl -o ip2location_ipv6.bin https://ytz-cloud-production.s3.amazonaws.com/yredir/geoip/IPV6-COUNTRY-REGION-CITY-LATITUDE-LONGITUDE-ISP-DOMAIN-MOBILE-USAGETYPE.BIN; cd -; }; \
+          cd ./database/geoip && { curl -o ip2location_proxy.bin https://ytz-cloud-production.s3.amazonaws.com/yredir/geoip/IP2PROXY-IP-PROXYTYPE-COUNTRY.BIN; cd -; }; \
+          echo "needs_to_cache=true" >> $GITHUB_OUTPUT
+
+      - name: Cache GeoIP from S3
+        if: steps.download_from_s3.outputs.needs_to_cache == 'true'
+        uses: actions/cache/save@v4
+        with:
+          key: geoip
+          path: ./database/geoip/

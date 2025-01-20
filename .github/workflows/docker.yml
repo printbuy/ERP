@@ -1,0 +1,122 @@
+name: Build & Push Docker Container
+
+on:
+  push:
+    branches:
+      - 'main'
+      - 'develop'
+  workflow_dispatch:
+
+env:
+  ORG_NAME: nsouto
+  APP_SLUG_NAME: invoiceshelf
+
+jobs:
+  environment:
+    name: Detect Environment
+    uses: ./.github/workflows/environment.yml
+
+  geoip:
+    name: Download GeoIP
+    uses: ./.github/workflows/geoip.yml
+
+#  test:
+#    name: Run Tests
+#    uses: ./.github/workflows/test.yml
+#    secrets:
+#      PACKAGIST_TOKEN: ${{ secrets.PACKAGIST_TOKEN }}
+
+  dotenv:
+    name: Get DotEnv
+    needs: [ environment ]
+    uses: ./.github/workflows/dotenv.yml
+    secrets:
+      DOTENV_TOKEN: ${{ secrets.DOTENV_TOKEN }}
+    with:
+      ENV_NAME: ${{ needs.environment.outputs.env_name }}
+      SLUG_APP_NAME: invoiseshelf
+
+  build:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+    needs: [ environment, geoip, dotenv ]
+    concurrency: ${{ needs.environment.outputs.env_name }}
+    environment: ${{ needs.environment.outputs.env_name }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        tag:
+          - latest
+        platforms:
+          - linux/amd64
+          - linux/arm64
+
+    steps:
+      - name: Deploy
+        run: |
+          echo "Running for environment ${{ needs.environment.outputs.env_name }}"
+
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          lfs: false
+
+      - name: Download GeoIP from Cache
+        uses: actions/cache/restore@v4
+        with:
+          path: ./database/geoip/
+          key: geoip
+
+      - name: Download DotEnv from Cache
+        uses: actions/cache/restore@v4
+        with:
+          path: ./.env
+          key: dotenv_${{ needs.environment.outputs.env_name }}
+
+      - name: Import environment variables from a file
+        uses: cardinalby/export-env-action@v2
+        with:
+          envFile: ".env"
+          expand: "true"
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Build and push to Registry
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: ${{ matrix.platforms }}
+          push: true
+          tags:  |
+            docker.io/${{ env.ORG_NAME }}/${{ env.APP_SLUG_NAME }}:${{ needs.environment.outputs.env_name }}-${{ matrix.tag }}
+          build-args: |
+            "APP_NAME=${{ env.APP_NAME }}"
+            "APP_SLUG_NAME=${{ env.APP_SLUG_NAME }}"
+            "APP_ENV=${{ env.APP_ENV }}"
+
+      - name: Create Sentry release
+        uses: getsentry/action-release@v1
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ vars.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ vars.SENTRY_PROJECT }}
+        with:
+          environment: ${{ needs.environment.outputs.env_name }}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: Logs
+          path: ./storage/logs

@@ -1,0 +1,78 @@
+name: DotEnv
+
+on:
+  workflow_call:
+    inputs:
+      SLUG_APP_NAME:
+        description: 'Slug App Name'
+        type: string
+        required: true
+      ENV_NAME:
+        description: 'Environment Name'
+        type: string
+        required: true
+    secrets:
+      DOTENV_TOKEN:
+        description: 'DotEnv Token'
+        required: true
+
+jobs:
+  environment:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check if Cache is Available
+        uses: actions/cache/restore@v4
+        id: dotenv_cache
+        with:
+          key: dotenv_${{ inputs.ENV_NAME }}
+          lookup-only: true
+          path: ./.env
+
+      - name: Get env from DotEnv
+        if: steps.dotenv_cache.outputs.cache-hit != 'true'
+        run: |
+          curl -H 'Authorization: Bearer ${{ secrets.DOTENV_TOKEN }}' -H "Accept: application/json" -L '${{ format('https://dotenv.ca/api/{0}/docker/{1}', inputs.SLUG_APP_NAME, inputs.ENV_NAME) }}' --fail > raw.env \
+          && curl -sSfL https://raw.githubusercontent.com/dotenv-linter/dotenv-linter/master/install.sh | sh -s \
+          && ./bin/dotenv-linter fix
+
+      - name: Expand DotEnv Variables into a file
+        if: steps.dotenv_cache.outputs.cache-hit != 'true'
+        run: |
+          touch .env
+          sed -i '/^[[:blank:]]*#/d;s/#.*//' .env
+          while read -r LINE; do
+            if [[ $LINE == *'='* ]] && [[ $LINE != '#'* ]]; then
+              VAR_NAME="${LINE%%=*}"
+              VAR_VALUE="$(echo ${LINE#*=} | envsubst)"
+              if [[ $VAR_VALUE == *'"'* ]]; then
+                if [[ $VAR_VALUE == '"'*'"' ]]; then
+                  VAR_VALUE="${VAR_VALUE#\"}"
+                  VAR_VALUE="${VAR_VALUE%\"}"
+                fi
+              fi
+              if [[ $VAR_VALUE == *' '* ]] || [[ $VAR_VALUE == *'$'* ]] || [[ $VAR_VALUE == *'"'*'"'* ]]; then
+                printf '%s="%s"\n' "$VAR_NAME" "$VAR_VALUE" >> .env
+              else
+                printf '%s=%s\n' "$VAR_NAME" "$VAR_VALUE" >> .env
+              fi
+            fi
+          done < ./raw.env
+
+
+
+# TODO: Make this Conditional
+#      - name: Upload Expanded DotEnv to S3
+#        if: steps.dotenv_cache.outputs.cache-hit != 'true'
+#        run: |
+#          aws s3 cp ./${{ env.ENV_NAME }}.env s3://${{ vars.DOTENV_AWS_BUCKET }}/${{ env.APP_SLUG_NAME }}/${{ env.ENV_NAME }}.env
+#        env:
+#          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#          AWS_REGION: ${{ vars.AWS_REGION }}
+
+      - name: Cache GeoIP from S3
+        if: steps.dotenv_cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          key: dotenv_${{ inputs.ENV_NAME }}
+          path: ./.env
