@@ -1,7 +1,12 @@
 <template>
-  <BaseWizardStep
+  <!-- <BaseWizardStep
     :title="$t('wizard.database.database')"
     :description="$t('wizard.database.desc')"
+    step-container="w-full p-8 mb-8 bg-white border border-gray-200 border-solid rounded md:w-full"
+  > -->
+  <BaseWizardStep
+    title="Database"
+    description="Database Initialization"
     step-container="w-full p-8 mb-8 bg-white border border-gray-200 border-solid rounded md:w-full"
   >
     <component

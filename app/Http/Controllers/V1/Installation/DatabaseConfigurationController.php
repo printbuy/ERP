@@ -13,7 +13,7 @@ class DatabaseConfigurationController extends Controller
     /**
      * @var EnvironmentManager
      */
-    protected $EnvironmentManager;
+    protected $environmentManager;
 
     public function __construct(EnvironmentManager $environmentManager)
     {
@@ -28,7 +28,7 @@ class DatabaseConfigurationController extends Controller
         $results = $this->environmentManager->saveDatabaseVariables($request);
 
         if (array_key_exists('success', $results)) {
-            Artisan::call('key:generate --force');
+            //Artisan::call('key:generate --force');
             Artisan::call('optimize:clear');
             Artisan::call('config:clear');
             Artisan::call('cache:clear');
@@ -69,7 +69,6 @@ class DatabaseConfigurationController extends Controller
                 ];
 
                 break;
-
         }
 
         return response()->json([

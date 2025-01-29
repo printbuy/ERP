@@ -16,25 +16,36 @@
     <meta name="theme-color" content="#ffffff">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
+    <style>
+        /* Override the Calendar default view color */
+        .fc-view {
+            background-color: #fff;
+        }
+
+        .fc-event {
+            pointer-events: auto;
+            /* Ensure pointer events are enabled */
+        }
+    </style>
+
     <!-- Module Styles -->
     @foreach(\InvoiceShelf\Services\Module\ModuleFacade::allStyles() as $name => $path)
-        <link rel="stylesheet" href="/modules/styles/{{ $name }}">
+    <link rel="stylesheet" href="/modules/styles/{{ $name }}">
     @endforeach
 
     @vite('resources/scripts/main.js')
 </head>
 
-<body
-    class="h-full overflow-hidden bg-gray-100 font-base
+<body class="h-full overflow-hidden bg-gray-100 font-base
     @if(isset($current_theme)) theme-{{ $current_theme }} @else theme-{{get_app_setting('admin_portal_theme') ?? 'invoiceshelf'}} @endif ">
 
     <!-- Module Scripts -->
     @foreach (\InvoiceShelf\Services\Module\ModuleFacade::allScripts() as $name => $path)
-        @if (\Illuminate\Support\Str::startsWith($path, ['http://', 'https://']))
-            <script type="module" src="{!! $path !!}"></script>
-        @else
-            <script type="module" src="/modules/scripts/{{ $name }}"></script>
-        @endif
+    @if (\Illuminate\Support\Str::startsWith($path, ['http://', 'https://']))
+    <script type="module" src="{!! $path !!}"></script>
+    @else
+    <script type="module" src="/modules/scripts/{{ $name }}"></script>
+    @endif
     @endforeach
 
     <script type="module">
@@ -66,6 +77,7 @@
 
         window.InvoiceShelf.start()
     </script>
+
 </body>
 
 </html>

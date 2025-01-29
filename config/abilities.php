@@ -1,6 +1,7 @@
 <?php
 
 use InvoiceShelf\Models\Customer;
+use InvoiceShelf\Models\Installer;
 use InvoiceShelf\Models\CustomField;
 use InvoiceShelf\Models\Estimate;
 use InvoiceShelf\Models\ExchangeRateProvider;
@@ -45,6 +46,39 @@ return [
             'model' => Customer::class,
             'depends_on' => [
                 'view-customer',
+            ],
+        ],
+
+        // Installer
+        [
+            'name' => 'view installer',
+            'ability' => 'view-installer',
+            'model' => Installer::class,
+        ],
+        [
+            'name' => 'create installer',
+            'ability' => 'create-installer',
+            'model' => Installer::class,
+            'depends_on' => [
+                'view-installer',
+                'view-custom-field',
+            ],
+        ],
+        [
+            'name' => 'edit installer',
+            'ability' => 'edit-installer',
+            'model' => Installer::class,
+            'depends_on' => [
+                'view-installer',
+                'view-custom-field',
+            ],
+        ],
+        [
+            'name' => 'delete installer',
+            'ability' => 'delete-installer',
+            'model' => Installer::class,
+            'depends_on' => [
+                'view-installer',
             ],
         ],
 

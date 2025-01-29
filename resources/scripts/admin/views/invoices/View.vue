@@ -214,7 +214,7 @@ function sortData() {
 
 function updateSentInvoice() {
   let pos = invoiceList.value.findIndex(
-    (invoice) => invoice.id === invoiceData.value.id
+    (invoice) => invoice.id === invoiceData.value.id,
   )
 
   if (invoiceList.value[pos]) {
@@ -231,7 +231,8 @@ onSearched = debounce(onSearched, 500)
 <template>
   <SendInvoiceModal @update="updateSentInvoice" />
 
-  <BasePage v-if="invoiceData" class="xl:pl-96 xl:ml-8">
+  <!-- <BasePage v-if="invoiceData" class="xl:pl-96 xl:ml-8"> -->
+  <BasePage v-if="invoiceData" class="">
     <BasePageHeader :title="pageTitle">
       <template #actions>
         <div class="text-sm mr-3">
@@ -285,7 +286,7 @@ onSearched = debounce(onSearched, 500)
     </BasePageHeader>
 
     <!-- sidebar -->
-    <div
+    <!-- <div
       class="
         fixed
         top-0
@@ -497,21 +498,15 @@ onSearched = debounce(onSearched, 500)
           {{ $t('invoices.no_matching_invoices') }}
         </p>
       </div>
-    </div>
+    </div> -->
 
     <div
       class="flex flex-col min-h-0 mt-8 overflow-hidden"
       style="height: 75vh"
     >
       <iframe
-        :src="`${shareableLink}`"
-        class="
-          flex-1
-          border border-gray-400 border-solid
-          bg-white
-          rounded-md
-          frame-style
-        "
+        :src="`${shareableLink}#zoom=page-width`"
+        class="flex-1 border border-gray-400 border-solid bg-white rounded-md frame-style"
       />
     </div>
   </BasePage>

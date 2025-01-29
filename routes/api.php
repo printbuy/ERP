@@ -10,6 +10,8 @@ use InvoiceShelf\Http\Controllers\V1\Admin\Company\CompaniesController;
 use InvoiceShelf\Http\Controllers\V1\Admin\Company\CompanyController as AdminCompanyController;
 use InvoiceShelf\Http\Controllers\V1\Admin\Customer\CustomersController;
 use InvoiceShelf\Http\Controllers\V1\Admin\Customer\CustomerStatsController;
+use InvoiceShelf\Http\Controllers\V1\Admin\Installer\InstallersController;
+use InvoiceShelf\Http\Controllers\V1\Admin\Installer\InstallerStatsController;
 use InvoiceShelf\Http\Controllers\V1\Admin\CustomField\CustomFieldsController;
 use InvoiceShelf\Http\Controllers\V1\Admin\Dashboard\DashboardController;
 use InvoiceShelf\Http\Controllers\V1\Admin\Estimate\ChangeEstimateStatusController;
@@ -107,6 +109,11 @@ use InvoiceShelf\Http\Controllers\V1\Installation\OnboardingWizardController;
 use InvoiceShelf\Http\Controllers\V1\Installation\RequirementsController;
 use InvoiceShelf\Http\Controllers\V1\Webhook\CronJobController;
 
+use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
+use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
+use Stancl\Tenancy\Middleware\InitializeTenancyByDomainOrSubdomain;
+use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -159,7 +166,11 @@ Route::prefix('/v1')->group(function () {
     // Onboarding
     // ----------------------------------
 
-    Route::middleware(['redirect-if-installed'])->prefix('installation')->group(function () {
+    Route::middleware([
+        'redirect-if-installed',
+        InitializeTenancyByDomain::class,
+        PreventAccessFromCentralDomains::class
+    ])->prefix('installation')->group(function () {
         Route::get('/wizard-step', [OnboardingWizardController::class, 'getStep']);
 
         Route::post('/wizard-step', [OnboardingWizardController::class, 'updateStep']);
@@ -179,7 +190,11 @@ Route::prefix('/v1')->group(function () {
         Route::post('/finish', FinishController::class);
     });
 
-    Route::middleware(['auth:sanctum', 'company'])->group(function () {
+    Route::middleware([
+        'auth:sanctum', 'company',
+        InitializeTenancyByDomain::class,
+        PreventAccessFromCentralDomains::class,
+    ])->group(function () {
         Route::middleware(['bouncer'])->group(function () {
 
             // Bootstrap
@@ -239,6 +254,15 @@ Route::prefix('/v1')->group(function () {
 
             Route::resource('customers', CustomersController::class);
 
+            // Installers
+            //----------------------------------
+
+            Route::post('/installers/delete', [InstallersController::class, 'delete']);
+
+            Route::get('installers/{installer}/stats', InstallerStatsController::class);
+
+            Route::resource('installers', InstallersController::class);
+
             // Items
             // ----------------------------------
 
@@ -247,6 +271,15 @@ Route::prefix('/v1')->group(function () {
             Route::resource('items', ItemsController::class);
 
             Route::resource('units', UnitsController::class);
+
+            // Tenants
+            //----------------------------------
+
+            // Route::post('/tenants/delete', [TenantsController::class, 'delete']);
+
+            // Route::resource('tenants', TenantsController::class);
+
+            // Route::resource('units', UnitsController::class);
 
             // Invoices
             // -------------------------------------------------

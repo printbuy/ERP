@@ -38,6 +38,8 @@ class Kernel extends HttpKernel
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \InvoiceShelf\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            // \Stancl\Tenancy\Middleware\InitializeTenancyByDomain::class,
+            // \Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains::class,
         ],
 
         'api' => [
