@@ -35,7 +35,7 @@ jobs:
       DOTENV_TOKEN: ${{ secrets.DOTENV_TOKEN }}
     with:
       ENV_NAME: ${{ needs.environment.outputs.env_name }}
-      SLUG_APP_NAME: invoiseshelf
+      SLUG_APP_NAME: invoiceshelf
 
   build:
     name: Build Docker Image
