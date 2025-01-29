@@ -27,20 +27,20 @@ jobs:
 #    secrets:
 #      PACKAGIST_TOKEN: ${{ secrets.PACKAGIST_TOKEN }}
 
-#  dotenv:
-#    name: Get DotEnv
-#    needs: [ environment ]
-#    uses: ./.github/workflows/dotenv.yml
-#    secrets:
-#      DOTENV_TOKEN: ${{ secrets.DOTENV_TOKEN }}
-#    with:
-#      ENV_NAME: ${{ needs.environment.outputs.env_name }}
-#      SLUG_APP_NAME: invoiseshelf
+  dotenv:
+    name: Get DotEnv
+    needs: [ environment ]
+    uses: ./.github/workflows/dotenv.yml
+    secrets:
+      DOTENV_TOKEN: ${{ secrets.DOTENV_TOKEN }}
+    with:
+      ENV_NAME: ${{ needs.environment.outputs.env_name }}
+      SLUG_APP_NAME: invoiseshelf
 
   build:
     name: Build Docker Image
     runs-on: ubuntu-latest
-    needs: [ environment, geoip ]
+    needs: [ environment, geoip, dotenv ]
     concurrency: ${{ needs.environment.outputs.env_name }}
     environment: ${{ needs.environment.outputs.env_name }}
 
