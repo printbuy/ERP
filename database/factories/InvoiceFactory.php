@@ -80,8 +80,8 @@ class InvoiceFactory extends Factory
      */
     public function definition()
     {
-        $sequenceNumber = (new SerialNumberFormatter())
-            ->setModel(new Invoice())
+        $sequenceNumber = (new SerialNumberFormatter)
+            ->setModel(new Invoice)
             ->setCompany(User::find(1)->companies()->first()->id)
             ->setNextNumbers();
 

@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Artisan;
 use InvoiceShelf\Models\User;
 use Laravel\Sanctum\Sanctum;
 
-use function Pest\Laravel\{getJson};
+use function Pest\Laravel\getJson;
 
 beforeEach(function () {
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder', '--force' => true]);

@@ -26,8 +26,8 @@ class PaymentFactory extends Factory
      */
     public function definition()
     {
-        $sequenceNumber = (new SerialNumberFormatter())
-            ->setModel(new Payment())
+        $sequenceNumber = (new SerialNumberFormatter)
+            ->setModel(new Payment)
             ->setCompany(User::find(1)->companies()->first()->id)
             ->setNextNumbers();
 
