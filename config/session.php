@@ -153,8 +153,7 @@ return [
     |
     */
 
-    //'domain' => env('SESSION_DOMAIN', null),
-    'domain' => $_SERVER['HTTP_HOST'],
+    'domain' => env('SESSION_DOMAIN', null),
 
     /*
     |--------------------------------------------------------------------------
