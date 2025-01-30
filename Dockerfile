@@ -1,6 +1,5 @@
 # Build stage
-FROM serversideup/php:8.3-fpm-nginx as builder
-
+FROM serversideup/php:8.3-fpm-nginx
 ENV PHP_OPCACHE_ENABLE=1
 
 USER root
@@ -30,17 +29,3 @@ RUN npm run build
 USER root
 RUN composer install --no-interaction --optimize-autoloader --no-dev
 
-# Runtime stage
-FROM serversideup/php:8.3-fpm-nginx
-
-ENV PHP_OPCACHE_ENABLE=1
-
-USER root
-
-# Copy PHP extensions from the builder stage
-COPY --from=builder /usr/local/lib/php/extensions/no-debug-non-zts-20200930 /usr/local/lib/php/extensions/no-debug-non-zts-20200930
-COPY --from=builder /usr/local/etc/php/conf.d /usr/local/etc/php/conf.d
-
-COPY --from=builder --chown=www-data:www-data /var/www/html /var/www/html
-
-USER www-data
