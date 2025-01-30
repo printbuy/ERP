@@ -1,22 +1,13 @@
-# Build stage
-FROM serversideup/php:8.3-fpm-nginx
+FROM serversideup/php:8.3-fpm-nginx-alpine
+
 ENV PHP_OPCACHE_ENABLE=1
 
 USER root
 
-# Install dependencies and PHP extensions
-RUN apt-get update && apt-get install -y \
-    libjpeg-dev \
-    libpng-dev \
-    libfreetype6-dev \
-    libzip-dev \
-    libicu-dev \
-    libonig-dev \
-    libxslt1-dev \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install -j$(nproc) gd zip intl mbstring xsl exif bcmath
+RUN install-php-extensions exif bcmath
 
 RUN curl -sL https://deb.nodesource.com/setup_20.x | bash -
+
 RUN apt-get install -y nodejs
 
 COPY --chown=www-data:www-data . /var/www/html
@@ -26,6 +17,4 @@ USER www-data
 RUN npm ci
 RUN npm run build
 
-USER root
 RUN composer install --no-interaction --optimize-autoloader --no-dev
-
