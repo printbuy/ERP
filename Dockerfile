@@ -6,11 +6,7 @@ USER root
 
 RUN install-php-extensions exif bcmath
 
-RUN if [ -f /etc/alpine-release ]; then \
-        apk add --no-cache nodejs npm; \
-    else \
-        curl -sL https://deb.nodesource.com/setup_20.x | bash - \
-    fi
+RUN apk add --no-cache nodejs npm;
 
 RUN apt-get install -y nodejs
 
