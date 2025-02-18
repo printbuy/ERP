@@ -106,6 +106,8 @@ jobs:
         with:
           path: .env
           key: dotenv_${{ needs.environment.outputs.env_name }}
+          restore-keys: |
+            dotenv_
 
       - name: Copy GeoIP data into current_repo
         run: |
