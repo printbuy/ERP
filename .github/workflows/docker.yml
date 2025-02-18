@@ -100,12 +100,18 @@ jobs:
         with:
           path: database/geoip/
           key: geoip
+          enableCrossOsArchive: true
+          fail-on-cache-miss: false
+          lookup-only: false
 
       - name: Download DotEnv from Cache
         uses: actions/cache/restore@v4
         with:
           path: .env
           key: dotenv_${{ needs.environment.outputs.env_name }}
+          enableCrossOsArchive: true
+          fail-on-cache-miss: false
+          lookup-only: false
 
       - name: Copy GeoIP data into current_repo
         run: |
