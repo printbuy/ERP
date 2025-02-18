@@ -24,9 +24,11 @@ jobs:
         uses: actions/cache/restore@v4
         id: dotenv_cache
         with:
-          key: dotenv_${{ inputs.ENV_NAME }}
-          lookup-only: true
           path: ./.env
+          key: dotenv_${{ inputs.ENV_NAME }}
+          enableCrossOsArchive: true
+          fail-on-cache-miss: false
+          lookup-only: true
 
       - name: Get env from DotEnv
         if: steps.dotenv_cache.outputs.cache-hit != 'true'
@@ -74,5 +76,6 @@ jobs:
         if: steps.dotenv_cache.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
         with:
-          key: dotenv_${{ inputs.ENV_NAME }}
           path: ./.env
+          key: dotenv_${{ inputs.ENV_NAME }}
+          enableCrossOsArchive: true
