@@ -130,12 +130,6 @@ jobs:
             echo ".env file not found in the root directory."
           fi
 
-      - name: Debug - list root directory
-        run: ls -al
-
-      - name: Debug - list current_repo directory
-        run: ls -al current_repo
-
       - name: Import environment variables from file
         uses: cardinalby/export-env-action@v2
         with:
