@@ -74,7 +74,7 @@ jobs:
         run: |
           echo "Building for env: ${{ needs.environment.outputs.env_name }}, arch: ${{ matrix.arch.name }}"
 
-      # Checkout your current repo (contains your Dockerfile and other files)
+      # Checkout your current repository (which contains your Dockerfile and other needed files)
       - name: Check out current repo
         uses: actions/checkout@v4
         with:
@@ -94,18 +94,35 @@ jobs:
           cp -r invoiceshelf_repo/* current_repo/
           cp -r invoiceshelf_repo/.[^.]* current_repo/ || true
 
-      # (Optional) Restore caches
+      # Restore caches and copy to current_repo
       - name: Download GeoIP from Cache
         uses: actions/cache/restore@v4
         with:
-          path: current_repo/database/geoip/
+          path: database/geoip/
           key: geoip
 
       - name: Download DotEnv from Cache
         uses: actions/cache/restore@v4
         with:
-          path: current_repo/.env
+          path: .env
           key: dotenv_${{ needs.environment.outputs.env_name }}
+
+      - name: Copy GeoIP data into current_repo
+        run: |
+          if [ -d "database/geoip" ]; then
+            mkdir -p current_repo/database/geoip
+            cp -r database/geoip/* current_repo/database/geoip/
+          else
+            echo "No GeoIP data found in the root directory."
+          fi
+
+      - name: Copy .env into current_repo
+        run: |
+          if [ -f ".env" ]; then
+            cp .env current_repo/
+          else
+            echo ".env file not found in the root directory."
+          fi
 
       - name: Import environment variables from file
         uses: cardinalby/export-env-action@v2
@@ -157,7 +174,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-      # Create manifest for the "latest" tag (using env name)
+      # Create manifest for the "latest" tag (using your environment output)
       - name: Create and push manifest for latest tag
         run: |
           docker manifest create docker.io/${{ env.ORG_NAME }}/${{ env.APP_SLUG_NAME }}:${{ needs.environment.outputs.env_name }}-latest \
