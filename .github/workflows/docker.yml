@@ -169,19 +169,51 @@ jobs:
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
       # Create manifest for the "latest" tag (using your environment output)
-      - name: Create and push manifest for latest tag
+      - name: Create and push manifest for latest tag using digests
         run: |
+          set -e
+          echo "Inspecting amd64 image..."
+          amd64_manifest=$(docker manifest inspect docker.io/${{ env.ORG_NAME }}/${{ env.APP_SLUG_NAME }}:${{ needs.environment.outputs.env_name }}-latest-amd64)
+          echo "$amd64_manifest" | jq .
+          amd64_digest=$(echo "$amd64_manifest" | jq -r '.manifests[0].digest')
+          echo "amd64 digest: $amd64_digest"
+          
+          echo "Inspecting arm64 image..."
+          arm64_manifest=$(docker manifest inspect docker.io/${{ env.ORG_NAME }}/${{ env.APP_SLUG_NAME }}:${{ needs.environment.outputs.env_name }}-latest-arm64)
+          echo "$arm64_manifest" | jq .
+          arm64_digest=$(echo "$arm64_manifest" | jq -r '.manifests[0].digest')
+          echo "arm64 digest: $arm64_digest"
+          
+          echo "Creating combined manifest..."
           docker manifest create docker.io/${{ env.ORG_NAME }}/${{ env.APP_SLUG_NAME }}:${{ needs.environment.outputs.env_name }}-latest \
-            docker.io/${{ env.ORG_NAME }}/${{ env.APP_SLUG_NAME }}:${{ needs.environment.outputs.env_name }}-latest-amd64 \
-            docker.io/${{ env.ORG_NAME }}/${{ env.APP_SLUG_NAME }}:${{ needs.environment.outputs.env_name }}-latest-arm64
+            docker.io/${{ env.ORG_NAME }}/${{ env.APP_SLUG_NAME }}@${amd64_digest} \
+            docker.io/${{ env.ORG_NAME }}/${{ env.APP_SLUG_NAME }}@${arm64_digest}
+          
+          echo "Pushing combined manifest..."
           docker manifest push docker.io/${{ env.ORG_NAME }}/${{ env.APP_SLUG_NAME }}:${{ needs.environment.outputs.env_name }}-latest
 
       # Create manifest for the version tag
-      - name: Create and push manifest for version tag
+      - name: Create and push manifest for version tag using digests
         run: |
+          set -e
+          echo "Inspecting amd64 version image..."
+          amd64_manifest=$(docker manifest inspect docker.io/${{ env.ORG_NAME }}/${{ env.APP_SLUG_NAME }}:${{ needs.version.outputs.version }}-amd64)
+          echo "$amd64_manifest" | jq .
+          amd64_digest=$(echo "$amd64_manifest" | jq -r '.manifests[0].digest')
+          echo "amd64 digest: $amd64_digest"
+
+          echo "Inspecting arm64 version image..."
+          arm64_manifest=$(docker manifest inspect docker.io/${{ env.ORG_NAME }}/${{ env.APP_SLUG_NAME }}:${{ needs.version.outputs.version }}-arm64)
+          echo "$arm64_manifest" | jq .
+          arm64_digest=$(echo "$arm64_manifest" | jq -r '.manifests[0].digest')
+          echo "arm64 digest: $arm64_digest"
+
+          echo "Creating combined manifest for version tag..."
           docker manifest create docker.io/${{ env.ORG_NAME }}/${{ env.APP_SLUG_NAME }}:${{ needs.version.outputs.version }} \
-            docker.io/${{ env.ORG_NAME }}/${{ env.APP_SLUG_NAME }}:${{ needs.version.outputs.version }}-amd64 \
-            docker.io/${{ env.ORG_NAME }}/${{ env.APP_SLUG_NAME }}:${{ needs.version.outputs.version }}-arm64
+            docker.io/${{ env.ORG_NAME }}/${{ env.APP_SLUG_NAME }}@${amd64_digest} \
+            docker.io/${{ env.ORG_NAME }}/${{ env.APP_SLUG_NAME }}@${arm64_digest}
+
+          echo "Pushing combined manifest for version tag..."
           docker manifest push docker.io/${{ env.ORG_NAME }}/${{ env.APP_SLUG_NAME }}:${{ needs.version.outputs.version }}
 
       - name: Create Sentry release
