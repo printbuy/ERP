@@ -171,10 +171,10 @@ jobs:
       # Create manifest for the "latest" tag (using your environment output)
       - name: Create and push manifest for latest tag
         run: |
-          docker manifest create docker.io/${{ env.ORG_NAME }}/${{ env.APP_SLUG_NAME }}:${{ needs.environment.outputs.env_name || 'production' }}-latest \
-            docker.io/${{ env.ORG_NAME }}/${{ env.APP_SLUG_NAME }}:${{ needs.environment.outputs.env_name || 'production' }}-latest-amd64 \
-            docker.io/${{ env.ORG_NAME }}/${{ env.APP_SLUG_NAME }}:${{ needs.environment.outputs.env_name || 'production' }}-latest-arm64
-          docker manifest push docker.io/${{ env.ORG_NAME }}/${{ env.APP_SLUG_NAME }}:${{ needs.environment.outputs.env_name || 'production' }}-latest
+          docker manifest create docker.io/${{ env.ORG_NAME }}/${{ env.APP_SLUG_NAME }}:${{ needs.environment.outputs.env_name }}-latest \
+            docker.io/${{ env.ORG_NAME }}/${{ env.APP_SLUG_NAME }}:${{ needs.environment.outputs.env_name }}-latest-amd64 \
+            docker.io/${{ env.ORG_NAME }}/${{ env.APP_SLUG_NAME }}:${{ needs.environment.outputs.env_name }}-latest-arm64
+          docker manifest push docker.io/${{ env.ORG_NAME }}/${{ env.APP_SLUG_NAME }}:${{ needs.environment.outputs.env_name }}-latest
 
       # Create manifest for the version tag
       - name: Create and push manifest for version tag
