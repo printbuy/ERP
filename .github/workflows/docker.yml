@@ -98,7 +98,7 @@ jobs:
       - name: Download GeoIP from Cache
         uses: actions/cache/restore@v4
         with:
-          path: database/geoip/
+          path: ./database/geoip/
           key: geoip
           enableCrossOsArchive: true
           fail-on-cache-miss: false
@@ -107,7 +107,7 @@ jobs:
       - name: Download DotEnv from Cache
         uses: actions/cache/restore@v4
         with:
-          path: .env
+          path: ./.env
           key: dotenv_${{ needs.environment.outputs.env_name }}
           enableCrossOsArchive: true
           fail-on-cache-miss: false
