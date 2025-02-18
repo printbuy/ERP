@@ -45,6 +45,7 @@ jobs:
         with:
           repository: InvoiceShelf/InvoiceShelf
           path: invoice_repo
+          fetch-depth: 0  # Fetch entire history, including tags
       - name: Extract Version from remote repo
         id: extract_version
         working-directory: invoice_repo
