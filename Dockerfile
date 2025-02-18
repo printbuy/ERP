@@ -4,16 +4,13 @@ ENV PHP_OPCACHE_ENABLE=1
 
 USER root
 
-RUN install-php-extensions exif bcmath
-
-# Install a newer version of Node from the edge community repository along with SQLite packages
-RUN apk add --no-cache --repository=http://dl-cdn.alpinelinux.org/alpine/edge/community nodejs-current npm sqlite sqlite-libs sqlite-dev
+RUN install-php-extensions exif bcmath && \
+    apk add --no-cache --repository=http://dl-cdn.alpinelinux.org/alpine/edge/community nodejs-current npm sqlite sqlite-libs sqlite-dev
 
 COPY --chown=www-data:www-data . /var/www/html
 
 USER www-data
 
-RUN npm install
-RUN npm run build
-
-RUN composer install --no-interaction --optimize-autoloader --no-dev
+RUN npm install && \
+    npm run build && \
+    composer install --no-interaction --optimize-autoloader --no-dev
