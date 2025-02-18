@@ -31,7 +31,7 @@ jobs:
     secrets:
       DOTENV_TOKEN: ${{ secrets.DOTENV_TOKEN }}
     with:
-      ENV_NAME: ${{ needs.environment.outputs.env_name }}
+      ENV_NAME: ${{ needs.environment.outputs.env_name || 'production' }}
       SLUG_APP_NAME: invoiceshelf
 
   version:
@@ -72,7 +72,7 @@ jobs:
     steps:
       - name: Report environment and arch
         run: |
-          echo "Building for env: ${{ needs.environment.outputs.env_name }}, arch: ${{ matrix.arch.name }}"
+          echo "Building for env: ${{ needs.environment.outputs.env_name || 'production' }}, arch: ${{ matrix.arch.name }}"
 
       # Checkout your current repository (which contains your Dockerfile and other needed files)
       - name: Check out current repo
@@ -102,7 +102,7 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: ./.env
-          key: dotenv_${{ needs.environment.outputs.env_name }}
+          key: dotenv_${{ needs.environment.outputs.env_name || 'production' }}
           enableCrossOsArchive: true
           fail-on-cache-miss: false
           lookup-only: false
@@ -146,7 +146,7 @@ jobs:
           #   1. One for the "latest" (based on your environment)
           #   2. One with the version from the remote repo
           tags: |
-            docker.io/${{ env.ORG_NAME }}/${{ env.APP_SLUG_NAME }}:${{ needs.environment.outputs.env_name }}-latest-${{ matrix.arch.name }}
+            docker.io/${{ env.ORG_NAME }}/${{ env.APP_SLUG_NAME }}:${{ needs.environment.outputs.env_name || 'production' }}-latest-${{ matrix.arch.name }}
             docker.io/${{ env.ORG_NAME }}/${{ env.APP_SLUG_NAME }}:${{ needs.version.outputs.version }}-${{ matrix.arch.name }}
           build-args: |
             "APP_NAME=${{ env.APP_NAME }}"
@@ -159,7 +159,7 @@ jobs:
   manifest:
     name: Create and Push Multi-Arch Manifests
     runs-on: ubuntu-latest
-    needs: [environment, build]
+    needs: [ environment, version, build ]
     steps:
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -170,10 +170,10 @@ jobs:
       # Create manifest for the "latest" tag (using your environment output)
       - name: Create and push manifest for latest tag
         run: |
-          docker manifest create docker.io/${{ env.ORG_NAME }}/${{ env.APP_SLUG_NAME }}:${{ needs.environment.outputs.env_name }}-latest \
-            docker.io/${{ env.ORG_NAME }}/${{ env.APP_SLUG_NAME }}:${{ needs.environment.outputs.env_name }}-latest-amd64 \
-            docker.io/${{ env.ORG_NAME }}/${{ env.APP_SLUG_NAME }}:${{ needs.environment.outputs.env_name }}-latest-arm64
-          docker manifest push docker.io/${{ env.ORG_NAME }}/${{ env.APP_SLUG_NAME }}:${{ needs.environment.outputs.env_name }}-latest
+          docker manifest create docker.io/${{ env.ORG_NAME }}/${{ env.APP_SLUG_NAME }}:${{ needs.environment.outputs.env_name || 'production' }}-latest \
+            docker.io/${{ env.ORG_NAME }}/${{ env.APP_SLUG_NAME }}:${{ needs.environment.outputs.env_name || 'production' }}-latest-amd64 \
+            docker.io/${{ env.ORG_NAME }}/${{ env.APP_SLUG_NAME }}:${{ needs.environment.outputs.env_name || 'production' }}-latest-arm64
+          docker manifest push docker.io/${{ env.ORG_NAME }}/${{ env.APP_SLUG_NAME }}:${{ needs.environment.outputs.env_name || 'production' }}-latest
 
       # Create manifest for the version tag
       - name: Create and push manifest for version tag
@@ -190,7 +190,7 @@ jobs:
           SENTRY_ORG: ${{ vars.SENTRY_ORG }}
           SENTRY_PROJECT: ${{ vars.SENTRY_PROJECT }}
         with:
-          environment: ${{ needs.environment.outputs.env_name }}
+          environment: ${{ needs.environment.outputs.env_name || 'production' }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
