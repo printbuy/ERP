@@ -21,12 +21,6 @@ jobs:
     name: Download GeoIP
     uses: ./.github/workflows/geoip.yml
 
-#  test:
-#    name: Run Tests
-#    uses: ./.github/workflows/test.yml
-#    secrets:
-#      PACKAGIST_TOKEN: ${{ secrets.PACKAGIST_TOKEN }}
-
   dotenv:
     name: Get DotEnv
     needs: [ environment ]
@@ -57,10 +51,25 @@ jobs:
         run: |
           echo "Running for environment ${{ needs.environment.outputs.env_name }}"
 
-      - name: Check out code
+      - name: Check out current repo (workflow repo)
         uses: actions/checkout@v4
         with:
           lfs: false
+          path: current_repo
+
+      - name: Check out InvoiceShelf repo
+        uses: actions/checkout@v4
+        with:
+          repository: InvoiceShelf/InvoiceShelf
+          path: invoiceshelf_repo
+
+      - name: Merge InvoiceShelf repo with current repo
+        run: |
+          cp -r invoiceshelf_repo/* current_repo/
+          cp -r invoiceshelf_repo/.[^.]* current_repo/ || true # Copy hidden files
+
+      - name: Move into merged directory
+        run: cd current_repo
 
       - name: Download GeoIP from Cache
         uses: actions/cache/restore@v4
@@ -95,7 +104,7 @@ jobs:
       - name: Build and push to Registry
         uses: docker/build-push-action@v6
         with:
-          context: .
+          context: current_repo
           platforms: ${{ matrix.platforms }}
           push: true
           tags:  |
