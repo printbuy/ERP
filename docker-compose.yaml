@@ -13,6 +13,8 @@ services:
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
     volumes:
       - db_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
 
   redis:
     image: redis:7
@@ -21,9 +23,7 @@ services:
       - redis_data:/data
 
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: nsouto/invoiceshelf:production-latest
     container_name: app
     environment:
       APP_ENV: ${APP_ENV:-production}
@@ -67,12 +67,10 @@ services:
       - db
       - redis
     ports:
-      - "8000:8080"
+      - "8001:8080"
 
   horizon:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: nsouto/invoiceshelf:production-latest
     container_name: horizon
     command: php artisan horizon
     environment:
@@ -114,12 +112,10 @@ services:
       - redis
       - db
     ports:
-      - "8001:8080"
+      - "8002:8080"
 
   scheduler:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: nsouto/invoiceshelf:production-latest
     container_name: scheduler
     command: |
       sh -c "while [ true ]; do php artisan schedule:run --no-interaction --quiet; sleep 60; done"
@@ -158,6 +154,7 @@ services:
       SENTRY_LARAVEL_DSN: ${SENTRY_LARAVEL_DSN:-null}
       SESSION_DOMAIN: ${SESSION_DOMAIN:-invoiceshelf.test}
       TRUSTED_PROXIES: ${TRUSTED_PROXIES:-*}
+
     depends_on:
       - redis
       - db
