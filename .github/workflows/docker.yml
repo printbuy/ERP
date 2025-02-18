@@ -88,13 +88,7 @@ jobs:
           repository: InvoiceShelf/InvoiceShelf
           path: invoiceshelf_repo
 
-      # Merge the remote repo into the current repo
-      - name: Merge InvoiceShelf repo with current repo
-        run: |
-          cp -r invoiceshelf_repo/* current_repo/
-          cp -r invoiceshelf_repo/.[^.]* current_repo/ || true
-
-      # Restore caches and copy to current_repo
+      # Restore caches
       - name: Download GeoIP from Cache
         uses: actions/cache/restore@v4
         with:
@@ -113,22 +107,15 @@ jobs:
           fail-on-cache-miss: false
           lookup-only: false
 
-      - name: Copy GeoIP data into current_repo
+      # Merge all files into one folder
+      - name: Merge InvoiceShelf repo and copy additional files into current_repo
         run: |
-          if [ -d "database/geoip" ]; then
-            mkdir -p current_repo/database/geoip
-            cp -r database/geoip/* current_repo/database/geoip/
-          else
-            echo "No GeoIP data found in the root directory."
-          fi
-
-      - name: Copy .env into current_repo
-        run: |
-          if [ -f ".env" ]; then
-            cp .env current_repo/
-          else
-            echo ".env file not found in the root directory."
-          fi
+          # Merge remote repo into current_repo
+          cp -r invoiceshelf_repo/* current_repo/
+          cp -r invoiceshelf_repo/.[^.]* current_repo/ || true
+          mkdir -p current_repo/database/geoip
+          cp -r database/geoip/* current_repo/database/geoip/
+          cp ./.env current_repo/
 
       - name: Import environment variables from file
         uses: cardinalby/export-env-action@v2
