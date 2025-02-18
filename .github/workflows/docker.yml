@@ -106,8 +106,6 @@ jobs:
         with:
           path: .env
           key: dotenv_${{ needs.environment.outputs.env_name }}
-          restore-keys: |
-            dotenv_
 
       - name: Copy GeoIP data into current_repo
         run: |
@@ -125,6 +123,12 @@ jobs:
           else
             echo ".env file not found in the root directory."
           fi
+
+      - name: Debug - list root directory
+        run: ls -al
+
+      - name: Debug - list current_repo directory
+        run: ls -al current_repo
 
       - name: Import environment variables from file
         uses: cardinalby/export-env-action@v2
