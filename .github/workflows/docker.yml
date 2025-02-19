@@ -216,18 +216,11 @@ jobs:
           echo "Pushing combined manifest for version tag..."
           docker manifest push docker.io/${{ env.ORG_NAME }}/${{ env.APP_SLUG_NAME }}:${{ needs.version.outputs.version }}
 
-      - name: Create Sentry release
-        uses: getsentry/action-release@v1
-        env:
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          SENTRY_ORG: ${{ vars.SENTRY_ORG }}
-          SENTRY_PROJECT: ${{ vars.SENTRY_PROJECT }}
-        with:
-          environment: ${{ needs.environment.outputs.env_name || 'production' }}
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
-        if: failure()
-        with:
-          name: Logs
-          path: current_repo/storage/logs
+#      - name: Create Sentry release
+#        uses: getsentry/action-release@v1
+#        env:
+#          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+#          SENTRY_ORG: ${{ vars.SENTRY_ORG }}
+#          SENTRY_PROJECT: ${{ vars.SENTRY_PROJECT }}
+#        with:
+#          environment: ${{ needs.environment.outputs.env_name || 'production' }}
