@@ -13,4 +13,5 @@ USER www-data
 
 RUN npm install && \
     npm run build && \
-    composer install --no-interaction --optimize-autoloader --no-dev
+    composer install --no-interaction --optimize-autoloader --no-dev && \
+    find /var/www/html/storage/framework /var/www/html/storage/logs /var/www/html/bootstrap/cache -type d -exec chmod 775 {} \;
